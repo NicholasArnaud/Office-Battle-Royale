@@ -1,24 +1,49 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 public class Character : MonoBehaviour
 {
     public string mName;
-    public float mMovementSpeed;
-
-
+    public int mMaxHealth;
+    public int mCurrentHealth;
+    public bool mIsStunned;
 
     void Awake()
     {
-#if UNITY_EDITOR
-        if (mName == "")
-            mName = "Default";
-        if (mMovementSpeed == 0)
-            mMovementSpeed = 1;
-#endif        
-        Assert.IsTrue(mName == "", "Character has no name.");
-        Assert.IsTrue(mMovementSpeed == 0, "Movement speed not set");
+        mName = (mName == "") ? "Default" : mName;
+        mMaxHealth = (mMaxHealth == 0) ? 1 : mMaxHealth;
+        mCurrentHealth = mMaxHealth;
+        CharacterEvent.Event.mCharacterUpdated.Invoke(this);
+        CharacterEvent.Event.mCharacterDamaged.AddListener(TakeDamage);
+        CharacterEvent.Event.mCharacterStunned.AddListener(Stun);
     }
+
+    void TakeDamage(int amount, Character character)
+    {
+        if (character != this || amount == 0)
+            return;
+        mCurrentHealth = (mCurrentHealth - amount < 0) ? 0 : mCurrentHealth - amount;
+        CharacterEvent.Event.mCharacterUpdated.Invoke(this);
+    }
+
+    void Stun(float duration, Character character)
+    {       
+        if(character != this || duration <= 0)
+            return;
+        mIsStunned = true;
+        StartCoroutine(StunnedDelay(duration));
+    }
+
+    IEnumerator StunnedDelay(float delay)
+    {
+        CharacterEvent.Event.mCharacterUpdated.Invoke(this);
+        while (mIsStunned)
+        {            
+            yield return new WaitForSeconds(delay);
+            mIsStunned = false;            
+        }
+        CharacterEvent.Event.mCharacterUpdated.Invoke(this);
+    } 
 }
