@@ -9,6 +9,7 @@ public class Character : MonoBehaviour
     public int mMaxHealth;
     public int mCurrentHealth;
     public bool mIsStunned;
+    public bool mIsDead;
 
     void Awake()
     {
@@ -25,6 +26,20 @@ public class Character : MonoBehaviour
         if (character != this || amount == 0)
             return;
         mCurrentHealth = (mCurrentHealth - amount < 0) ? 0 : mCurrentHealth - amount;
+        CharacterEvent.Event.mCharacterUpdated.Invoke(this);
+        if (mCurrentHealth == 0)
+            StartCoroutine(Death());
+    }
+
+    IEnumerator Death()
+    {
+        mIsDead = true;
+        float counter = 0;
+        while (counter != 5)
+        {
+            counter += Time.deltaTime;
+            yield return null;
+        }
         CharacterEvent.Event.mCharacterUpdated.Invoke(this);
     }
 

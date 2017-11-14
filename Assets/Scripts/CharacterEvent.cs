@@ -8,7 +8,6 @@ using UnityEngine.Events;
 namespace CharacterEvent
 {
     public class CharacterUpdateEvent : UnityEvent<Character> { }
-
     public class CharacterTakeDamageEvent : UnityEvent<int, Character> { }
     public class CharacterStunEvent : UnityEvent<float, Character> { }
 
