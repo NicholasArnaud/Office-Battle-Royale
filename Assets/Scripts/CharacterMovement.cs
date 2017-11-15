@@ -20,8 +20,13 @@ public class CharacterMovement : MonoBehaviour
         float rotation = Input.GetAxis(mRotationAxis) * mRotationSpeed;
         float horizontal = Input.GetAxis(mHorizontalAxis) * mMovementSpeed;
         float vertical = Input.GetAxis(mVerticalAxis) * mMovementSpeed;
-        transform.Rotate(new Vector3(0,rotation,0));
-        transform.Translate(new Vector3(horizontal, 0, vertical));
+        transform.Rotate(new Vector3(0,rotation,0));        
+        if (GetComponent<CharacterJump>().mIsGrounded)
+        {
+            Vector3 directionalMovement = (transform.forward * vertical) + (transform.right * horizontal);            
+            transform.TransformDirection(directionalMovement);
+            GetComponent<Rigidbody>().velocity = directionalMovement;            
+        }
     }
 }
 
@@ -36,13 +41,13 @@ class ControlsCheck : Editor
         CharacterMovement myScript = (CharacterMovement) target;
         if (GUILayout.Button("Check Axis Names"))
         {
-            IsAxisAvilable(myScript.mRotationAxis, "mRotationAxis");
-            IsAxisAvilable(myScript.mHorizontalAxis, "mHorizontalAxis");
-            IsAxisAvilable(myScript.mVerticalAxis, "mVerticalAxis");
+            IsAxisAvailable(myScript.mRotationAxis, "mRotationAxis");
+            IsAxisAvailable(myScript.mHorizontalAxis, "mHorizontalAxis");
+            IsAxisAvailable(myScript.mVerticalAxis, "mVerticalAxis");
         }
     }
 
-    void IsAxisAvilable(string axis, string property)
+    void IsAxisAvailable(string axis, string property)
     {
         try
         {
