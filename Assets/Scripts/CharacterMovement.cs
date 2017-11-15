@@ -14,6 +14,15 @@ public class CharacterMovement : MonoBehaviour
     public string mHorizontalAxis;
     public string mVerticalAxis;
     public string mRotationAxis;
+
+    void Update()
+    {
+        float rotation = Input.GetAxis(mRotationAxis) * mRotationSpeed;
+        float horizontal = Input.GetAxis(mHorizontalAxis) * mMovementSpeed;
+        float vertical = Input.GetAxis(mVerticalAxis) * mMovementSpeed;
+        transform.Rotate(new Vector3(0,rotation,0));
+        transform.Translate(new Vector3(horizontal, 0, vertical));
+    }
 }
 
 #if UNITY_EDITOR
@@ -27,15 +36,27 @@ class ControlsCheck : Editor
         CharacterMovement myScript = (CharacterMovement) target;
         if (GUILayout.Button("Check Axis Names"))
         {
-            IsAxisAvilable(myScript.mRotationAxis);
-            IsAxisAvilable(myScript.mHorizontalAxis);
-            IsAxisAvilable(myScript.mVerticalAxis);
+            IsAxisAvilable(myScript.mRotationAxis, "mRotationAxis");
+            IsAxisAvilable(myScript.mHorizontalAxis, "mHorizontalAxis");
+            IsAxisAvilable(myScript.mVerticalAxis, "mVerticalAxis");
         }
     }
 
-    void IsAxisAvilable(string axis)
-    {        
-            Input.GetAxis(axis);        
+    void IsAxisAvilable(string axis, string property)
+    {
+        try
+        {
+            Input.GetAxis(axis);
+            Debug.Log(property + "'s value of " + axis + " is valid.");
+        }
+        catch (ArgumentException exc)
+        {
+            if(axis != "")
+                Debug.LogWarning(property + "'s value of " + axis + 
+                    " is not set up in the input manager.");
+            else
+                Debug.LogWarning("Assign an axis for the property " + property + ".");            
+        }                
     }
 }
 #endif
