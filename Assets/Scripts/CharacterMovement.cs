@@ -33,7 +33,7 @@ public class CharacterMovement : MonoBehaviour
 #if UNITY_EDITOR
 [CustomEditor(typeof(CharacterMovement))]
 [CanEditMultipleObjects]
-class ControlsCheck : Editor
+class MovementControlsCheck : Editor
 {
     public override void OnInspectorGUI()
     {
